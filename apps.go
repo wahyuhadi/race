@@ -38,7 +38,7 @@ func CheckOptions(opts *models.Opt) (err error) {
 	}
 
 	if opts.URL == "" {
-		return errors.New("url is empty")
+		return errors.New("url is empty : example input https://api.lab.local")
 	}
 	return nil
 }

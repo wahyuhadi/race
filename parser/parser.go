@@ -62,8 +62,7 @@ func Parse(request, baseURL string, unsafe bool) (*Request, error) {
 	if len(parts) < 3 && !unsafe {
 		return nil, fmt.Errorf("malformed request supplied")
 	}
-	// Check if we have also a path from the passed base URL and if yes,
-	// append that to the unsafe request as well.
+
 	if parsedURL.Path != "" && strings.HasPrefix(parts[1], "/") && parts[1] != parsedURL.Path {
 		rawRequest.UnsafeRawBytes = fixUnsafeRequestPath(parsedURL, parts[1], rawRequest.UnsafeRawBytes)
 	}
@@ -92,8 +91,6 @@ func Parse(request, baseURL string, unsafe bool) (*Request, error) {
 			multiPartRequest = true
 		}
 
-		// in case of unsafe requests multiple headers should be accepted
-		// therefore use the full line as key
 		_, found := rawRequest.Headers[key]
 		if unsafe {
 			rawRequest.UnsafeHeaders = append(rawRequest.UnsafeHeaders, client.Header{Key: line})
@@ -109,8 +106,6 @@ func Parse(request, baseURL string, unsafe bool) (*Request, error) {
 		}
 	}
 
-	// Handle case with the full http url in path. In that case,
-	// ignore any host header that we encounter and use the path as request URL
 	if !unsafe && strings.HasPrefix(parts[1], "http") {
 		parsed, parseErr := url.Parse(parts[1])
 		if parseErr != nil {
@@ -139,8 +134,6 @@ func Parse(request, baseURL string, unsafe bool) (*Request, error) {
 		}
 		rawRequest.FullURL = fmt.Sprintf("%s://%s%s", parsedURL.Scheme, strings.TrimSpace(hostURL), rawRequest.Path)
 
-		// If raw request doesn't have a Host header and isn't marked unsafe,
-		// this will generate the Host header from the parsed baseURL
 		if rawRequest.Headers["Host"][0] == "" {
 			rawRequest.Headers["Host"] = []string{hostURL}
 		}
